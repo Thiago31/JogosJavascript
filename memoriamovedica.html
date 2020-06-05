@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<!--
+Página do jogo Memória Movediça
+-->
+<html>
+    <head>
+        <title>Memória Movediça - Jogos Javascript</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="css/style.css"/>
+        <link rel="shortcut icon" href="favicon/favicon.ico" />
+        <script src="js/common.js"></script>
+        <script src="js/memoria.js"></script>
+    </head>
+    <body>
+        <h1>Memória Movediça</h1>
+        <p>Memória Movediça é um jogo similar ao jogo da memória tradicional,
+            com uma diferença: de tempos em tempos duas cartas aleatórias irão
+            trocar de posição entre si. O jogador deve ser rápido para achar os
+            pares antes que as cartas se movimentem ou tenha uma memória boa 
+            para lembrar a posição dos ítens após a movimentação.</p>
+
+        <h2>Como jogar</h2>
+        <p>Clique no botão <span class="button-style">Jogar</span> para iniciar.
+            Clique em duas cartas para desvirá-las. Se elas corresponderem à 
+            mesma imagem, serão retiradas do jogo e você ganha 10 pontos, caso
+            contrário, as cartas são viradas novamente e você perde 3 pontos. Há
+            um bônus adicional de 5 pontos cada vez que você desvira dois pares
+            corretos em sequência. Em intervalos por volta de 5 segundos, duas
+            cartas selecionadas de forma aleatória irão trocar de lugar. Nesse
+            momento todas as cartas estarão viradas e não será possível
+            desvirá-las até que as cartas em movimento cheguem no seu lugar de
+            destino. Memorize bem as cartas em movimento para não se confundir
+            com a posição delas.</p>
+        <div class="centered">
+            <canvas id="game" width="500" height="500"
+                    onclick="userClick(event)"
+                    onmousemove="pointButton(event)"></canvas>
+        </div>
+        <br><br>
+        <a href="index.html">Voltar</a>
+        <br><br>
+
+        <script>
+            var canvas = document.getElementById("game");
+            var ctx = canvas.getContext("2d");
+
+            var interval;
+            var playing = false;
+            var cardCount = 36;
+            var openedCount = 0;
+            var lastOpened = null;
+            var firstOpened = null;
+            var score = new scoreLabel(0, 0, canvas.width, 50, "Pontuação: ");
+            var foundLast = false;
+
+
+            var startButton = new button("Jogar",
+                    canvas.width / 2, canvas.height / 2);
+            startButton.visible = true;
+            startButton.draw(ctx);
+
+            var cards = [];
+
+            function start() {
+                playing = true;
+                startButton.visible = false;
+                canvas.style.cursor = "default";
+                let p = score.height;
+                let r = 4;
+                let c = 5;
+                let s = 4;
+                let wc = (canvas.width - s * (c + 3)) / c;
+                let hc = (canvas.height - s * (r + 3) - p) / r;
+                let xi = 2 * s + wc / 2;
+                let yi = p + 2 * s + hc / 2;
+                let n = 1;
+                let shuffler = new randomId(r, c);
+                for (let i = 0; i < c; i++) {
+                    for (let j = 0; j < r; j++) {
+                        cards.push(new Card(xi + i * (s + wc), yi + j * (s + hc), wc, hc, shuffler.next()));
+                        n += 1;
+                    }
+                }
+
+                interval = setInterval(run, 20);
+            }
+
+            var waitClose = 0;
+            var waitDisapear = 0;
+            function update() {
+                if (lastOpened !== null) {
+                    if (lastOpened.id === firstOpened.id) {console.log(waitClose);
+                        waitDisapear += 1;
+                        if (waitDisapear === 20) {
+                            firstOpened.living = false;
+                            lastOpened.living = false;
+                            firstOpened = null;
+                            lastOpened = null;
+                            openedCount = 0;
+                            score.score += 10;
+                            if (foundLast) {
+                                score.score += 5;
+                            }
+                            foundLast = true;
+                            waitDisapear = 0;
+                        }
+
+                    } else if (lastOpened.state === "opened") {
+                        waitClose += 1;
+                        if (waitClose === 15) {
+                            firstOpened.state = "closing";
+                            lastOpened.state = "closing";
+                            score.score -= 3;
+                            foundLast = false;
+                        }
+                    } else if (lastOpened.state === "closed" && firstOpened.state === "closed") {
+                        firstOpened = null;
+                        lastOpened = null;
+                        openedCount = 0;
+                        waitClose = 0;
+                    }
+                }
+
+                for (card of cards) {
+                    card.update();
+                }
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (card of cards) {
+                    card.draw(ctx);
+                }
+                score.draw(ctx);
+
+            }
+
+            function run() {
+                update();
+                draw();
+            }
+
+            function userClick(e) {
+                let xc = e.offsetX;
+                let yc = e.offsetY;
+                if (playing === false) {
+                    if (startButton.isClickArea(xc, yc)) {
+                        start();
+                    }
+                    return;
+                }
+                if (openedCount === 2) {
+                    return;
+                }
+                for (card of cards) {
+                    if (card.containsArea(xc, yc)) {
+                        if (card.state === "closed") {
+                            card.state = "opening";
+                            openedCount += 1;
+                        }
+                        if (openedCount === 1) {
+                            firstOpened = card;
+                        }
+                        if (openedCount === 2) {
+                            lastOpened = card;
+
+                        }
+                    }
+                }
+            }
+
+            function pointButton(e) {
+                startButton.setPointer(canvas, e.offsetX, e.offsetY);
+            }
+
+        </script>
+    </body>
+</html>

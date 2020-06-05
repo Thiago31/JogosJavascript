@@ -46,8 +46,19 @@ function button(text, x, y, config) {
         ctx.restore();
 
     };
-    
-    this.isClickArea = function(xa, ya){
+
+    this.isClickArea = function (xa, ya) {
         return (xa > this.xl && xa < this.xr && ya > this.yt && ya < this.yb);
+    };
+
+    this.setPointer = function (canvas, xa, ya) {
+        if (this.visible === false) {
+            return;
+        }
+        if (this.isClickArea(xa, ya)) {
+            canvas.style.cursor = "pointer";
+        } else {
+            canvas.style.cursor = "default";
+        }
     };
 }

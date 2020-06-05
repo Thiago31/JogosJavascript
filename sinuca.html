@@ -38,10 +38,10 @@
         <div class="centered">
             <canvas id="game" width="600" height="600" onclick="tacada(event)"
                     onmousemove="pointer(event)"></canvas>
-            <br/><br/>
-            <a href="index.html">Voltar</a>
         </div>
-
+        <br><br>
+        <a href="index.html">Voltar</a>
+        <br><br>
         <script>
             var gameArea = document.getElementById("game");
             var ctx = gameArea.getContext("2d");
@@ -383,24 +383,24 @@
                 interval = setInterval(updateScreen, 20);
             }
 
-function pointer(e){
-    if(startButton.visible === false){
-        return;
-    }
-    let xm = e.offsetX;
-    let ym = e.offsetY;
-    if(startButton.isClickArea(xm, ym)){
-        gameArea.style.cursor = "pointer";
-    } else{
-        gameArea.style.cursor = "default";
-    }
-}
+            function pointer(e) {
+                if (startButton.visible === false) {
+                    return;
+                }
+                let xm = e.offsetX;
+                let ym = e.offsetY;
+                if (startButton.isClickArea(xm, ym)) {
+                    gameArea.style.cursor = "pointer";
+                } else {
+                    gameArea.style.cursor = "default";
+                }
+            }
             function tacada(e) {
-                
+
                 let xm = e.offsetX;
                 let ym = e.offsetY;
                 if (!jogando) {
-                    if(startButton.isClickArea(xm, ym)){
+                    if (startButton.isClickArea(xm, ym)) {
                         iniciar();
                         startButton.visible = false;
                         gameArea.style.cursor = "default";
@@ -432,8 +432,8 @@ function pointer(e){
                 }
                 return verify;
             }
-            
-            
+
+
 
 
         </script>
