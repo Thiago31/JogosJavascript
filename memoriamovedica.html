@@ -33,7 +33,7 @@ Página do jogo Memória Movediça
             destino. Memorize bem as cartas em movimento para não se confundir
             com a posição delas.</p>
         <div class="centered">
-            <canvas id="game" width="500" height="500"
+            <canvas id="game" width="600" height="600"
                     onclick="userClick(event)"
                     onmousemove="pointButton(event)"></canvas>
         </div>
@@ -43,64 +43,114 @@ Página do jogo Memória Movediça
 
         <script>
             var canvas = document.getElementById("game");
+            canvas.style.background = "#e0ffff";
             var ctx = canvas.getContext("2d");
 
+            /* 
+             * A variável pageShow é do tipo inteiro, controla qual página será
+             * exibida na tela. Dependendo do valor de pageShow, uma página
+             * determinada é exibida:
+             * 1. Tela inicial com botão 'Jogar'
+             * 2. Tela com opções do jogo (tema e número de peças)
+             * 3. Tela de jogo em execução
+             * 4. Tela de fim de jogo, mostrando a pontuação final e botão
+             *    'Recomeçar'
+             */
+            var pageShow = 1;
+
             var interval;
-            var playing = false;
-            var cardCount = 36;
+
+            var cardCount = 0;
             var openedCount = 0;
             var lastOpened = null;
             var firstOpened = null;
             var score = new scoreLabel(0, 0, canvas.width, 50, "Pontuação: ");
             var foundLast = false;
 
+            var image = new Image();
+            image.src = "img/startPageMemory.png";
 
             var startButton = new button("Jogar",
                     canvas.width / 2, canvas.height / 2);
             startButton.visible = true;
-            startButton.draw(ctx);
+
 
             var cards = [];
+            var ending = new endGame(canvas.width / 2, canvas.height / 2,
+                    canvas.width * 0.8, canvas.height * 0.6, "img/thumbs_up_smiley.png");
+
+            var waitClose = 0;
+            var waitDisapear = 0;
 
             function start() {
-                playing = true;
-                startButton.visible = false;
-                canvas.style.cursor = "default";
+                reset();
+
                 let p = score.height;
-                let r = 4;
-                let c = 5;
+                let r = 5;
+                let c = 4;
                 let s = 4;
                 let wc = (canvas.width - s * (c + 3)) / c;
                 let hc = (canvas.height - s * (r + 3) - p) / r;
                 let xi = 2 * s + wc / 2;
                 let yi = p + 2 * s + hc / 2;
-                let n = 1;
+
+                let centerR = -1;
+                let centerC = -1;
+                if (r * c % 2 === 1) {
+                    centerR = Math.floor(r / 2);
+                    centerC = Math.floor(c / 2);
+                }
+
                 let shuffler = new randomId(r, c);
                 for (let i = 0; i < c; i++) {
                     for (let j = 0; j < r; j++) {
-                        cards.push(new Card(xi + i * (s + wc), yi + j * (s + hc), wc, hc, shuffler.next()));
-                        n += 1;
+                        if (i === centerC && j === centerR) {
+                            continue;
+                        }
+                        cards.push(new Card(xi + i * (s + wc),
+                                yi + j * (s + hc), wc, hc, shuffler.next()));
                     }
                 }
-
-                interval = setInterval(run, 20);
+                pageShow = 3;
             }
 
-            var waitClose = 0;
-            var waitDisapear = 0;
+            function reset() {
+                cardCount = 0;
+                firstOpened = null;
+                lastOpened = null;
+                foundLast = false;
+                score.score = 0;
+                ending.points = 0;
+                cards = [];
+                canvas.style.cursor = "default";
+            }
+
             function update() {
+
+                if (pageShow === 1) {
+                    return;
+                }
+
                 if (lastOpened !== null) {
-                    if (lastOpened.id === firstOpened.id) {console.log(waitClose);
+                    if (lastOpened.id === firstOpened.id) {
+
                         waitDisapear += 1;
                         if (waitDisapear === 20) {
-                            firstOpened.living = false;
-                            lastOpened.living = false;
+                            firstOpened.state = "removed";
+                            lastOpened.state = "removed";
                             firstOpened = null;
                             lastOpened = null;
                             openedCount = 0;
                             score.score += 10;
+                            cardCount += 2;
+
                             if (foundLast) {
                                 score.score += 5;
+                            }
+                            if (cardCount === cards.length) {
+                                pageShow = 4;
+                                ending.state = "appearing";
+                                ending.points = score.score;
                             }
                             foundLast = true;
                             waitDisapear = 0;
@@ -125,14 +175,28 @@ Página do jogo Memória Movediça
                 for (card of cards) {
                     card.update();
                 }
+
+                ending.update();
             }
 
             function draw() {
+
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                for (card of cards) {
-                    card.draw(ctx);
+
+                if (pageShow === 1) {
+                    ctx.drawImage(image, 0, 0, 600, 600);
+                    startButton.draw(ctx);
+                    return;
+                } else if (pageShow === 2) {
+                    // code here.
+                } else if (pageShow === 3) {
+                    for (card of cards) {
+                        card.draw(ctx);
+                    }
+                    score.draw(ctx);
+                } else if (pageShow === 4) {
+                    ending.draw(ctx);
                 }
-                score.draw(ctx);
 
             }
 
@@ -144,36 +208,44 @@ Página do jogo Memória Movediça
             function userClick(e) {
                 let xc = e.offsetX;
                 let yc = e.offsetY;
-                if (playing === false) {
+                if (pageShow === 1) {
                     if (startButton.isClickArea(xc, yc)) {
                         start();
+                        startButton.visible = false;
                     }
-                    return;
-                }
-                if (openedCount === 2) {
-                    return;
-                }
-                for (card of cards) {
-                    if (card.containsArea(xc, yc)) {
-                        if (card.state === "closed") {
-                            card.state = "opening";
-                            openedCount += 1;
+                } else if (pageShow === 2) {
+                    //code here.
+                } else if (pageShow === 3) {
+                    if (openedCount === 2) {
+                        return;
+                    }
+                    for (card of cards) {
+                        if (card.containsArea(xc, yc)) {
+                            if (card.state === "closed") {
+                                card.state = "opening";
+                                openedCount += 1;
+                            }
+                            if (openedCount === 1) {
+                                firstOpened = card;
+                            }
+                            if (openedCount === 2) {
+                                lastOpened = card;
+                            }
                         }
-                        if (openedCount === 1) {
-                            firstOpened = card;
-                        }
-                        if (openedCount === 2) {
-                            lastOpened = card;
-
-                        }
+                    }
+                } else if (pageShow === 4) {
+                    if (ending.isClickArea(xc, yc)) {
+                        start();
+                        ending.hide();
                     }
                 }
             }
 
             function pointButton(e) {
                 startButton.setPointer(canvas, e.offsetX, e.offsetY);
+                ending.setPointer(canvas, e.offsetX, e.offsetY);
             }
-
+            interval = setInterval(run, 20);
         </script>
     </body>
 </html>

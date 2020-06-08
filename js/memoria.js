@@ -10,10 +10,9 @@ function Card(x, y, width, height, id) {
     this.xd = 0;
     this.yd = 0;
     this.id = id;
-    this.living = true;
 
     this.draw = function (ctx) {
-        if (this.living === false) {
+        if (this.state === "removed") {
             return;
         }
         ctx.save();
@@ -103,6 +102,9 @@ function Card(x, y, width, height, id) {
     };
 
     this.containsArea = function (xa, ya) {
+        if(this.state === "removed"){
+            return false;
+        }
         return (xa > this.x - this.width / 2 &&
                 xa < this.x + this.width / 2 &&
                 ya > this.y - this.height / 2 &&
@@ -125,7 +127,8 @@ function randomId(r, c) {
     this.size = r * c;
     this.returned = 0;
     this.list = [];
-    for (let i = 0; i < this.size / 2; i++) {
+    this.n = Math.floor(this.size / 2);console.log(this.n);
+    for (let i = 0; i < this.n; i++) {
         this.list[i] = 0;
     }
     this.next = function () {
@@ -134,7 +137,7 @@ function randomId(r, c) {
         }
         let s = -1;
         do {
-            s = Math.floor(Math.random() * this.size / 2);
+            s = Math.floor(Math.random() * this.n);
             this.list[s] += 1;
         } while (this.list[s] > 2);
         this.returned += 1;
@@ -157,7 +160,7 @@ function scoreLabel(x, y, width, height, text) {
         ctx.font = (this.height * 3 / 5) + "pt Arial";
         ctx.textAlign = "start";
         ctx.textBaseline = "middle";
-        ctx.fillStyle = "white";
+        ctx.fillStyle = "#aaeeaa";
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.fillStyle = "black";
         ctx.fillText(this.text + this.score, this.x, this.y + this.height / 2);
