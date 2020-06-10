@@ -1,5 +1,88 @@
+var themes = {
+    "Animais": [
+        "baby_fish_T.png",
+        "bear_song_dance_T.png",
+        "blowfish_cartoon_T.png",
+        "Bug_Watching_Fly_T.png",
+        "bull_angry_T.png",
+        "cartoon_leopard_T.png",
+        "cartoon_monkey_T.png",
+        "cartoon_whale_bold_T.png",
+        "crocodile_sitting_cartoon_T.png",
+        "dog_thoughtful_T.png",
+        "frog_pirate_T.png",
+        "lobster_cartoon_T.png",
+        "lovesick_elephant_T.png",
+        "lovesick_rhino_T.png",
+        "owl_on_book_T.png",
+        "penguin_sliding_on_ice_T.png",
+        "pig_with_spots_cartoon_T.png",
+        "pirate_parrot_T.png",
+        "rabbit_toon_1_T.png",
+        "rattlesnake_cartoon_T.png",
+        "rat_with_cheese_T.png",
+        "Rooster_cartoon_04_T.png",
+        "Tanuki_racoon_dog_T.png",
+        "walrus_cartoon_T.png"
+    ],
+    "Flores": [
+        "basket_flowers.png",
+        "beautiful_rose.png",
+        "black_eyed_susans.png",
+        "blue_and_yellow_flower.png",
+        "California_poppy.png",
+        "Cardinal_Flower__Lobelia_cardinalis.jpg",
+        "Chrysantemum_grandiflorum.png",
+        "chrysanthemum.png",
+        "crocus.png",
+        "dahlia.png",
+        "Dahlia_illustration.jpg",
+        "Hibiscus.png",
+        "hibiscus_2.png",
+        "Hollyhock.png",
+        "hyacinth.png",
+        "hydrangea.png",
+        "Indian_Cress.png",
+        "Laelia_gouldiana.png",
+        "lily_yellow_stylized.png",
+        "marigold.png",
+        "morning_glory_T.png",
+        "pansy_2.png",
+        "pansy_daisies.png",
+        "Papaver_Orientale.png",
+        "pink_white_flowers.png",
+        "Rudbeckia_hirta.png",
+        "tulip_field.png",
+        "vase_flowers.png",
+        "wagon_filled_with_flowers_T.png",
+        "water_lily.png",
+        "yellow_rose_2.png"
+    ],
+    "Smiley": [
+        "angel_wings_smiley_T.png",
+        "bull-fighting-smilie.png",
+        "chinese_cook_smiley.png",
+        "confused-smilie.png",
+        "farmer_smiley.png",
+        "nerdy-teacher-smiley.png",
+        "shy_clown.png",
+        "smiley-big-laugh.png",
+        "smiley_bandaged.png",
+        "smiley_glossy.png",
+        "smiley_rage.png",
+        "smiley_sleeping.png",
+        "smiley_wearing_party_hat.png",
+        "smiley_wearing_shades.png",
+        "smiley_w_mustache.png",
+        "smilie-in-love.png",
+        "smilie-thick-glasses.png",
+        "smilie_points_to_you.png"
+    ]
 
-function Card(x, y, width, height, id) {
+};
+
+
+function Card(x, y, width, height, id, theme) {
     this.x = x;
     this.y = y;
     this.width = width;
@@ -10,6 +93,12 @@ function Card(x, y, width, height, id) {
     this.xd = 0;
     this.yd = 0;
     this.id = id;
+    if (theme === undefined || theme === "Números") {
+        this.image = "";
+    } else {
+        this.image = new Image();
+        this.image.src = "img/themes/" + theme + "/" + themes[theme][id];
+    }
 
     this.draw = function (ctx) {
         if (this.state === "removed") {
@@ -17,21 +106,27 @@ function Card(x, y, width, height, id) {
         }
         ctx.save();
 
+
         let yt = this.y - this.height / 2;
         let yb = this.y + this.height / 2;
         let xl = this.x - this.width / 2;
         let xr = this.x + this.width / 2;
 
-        ctx.fillStyle = "blue";
-        ctx.fillRect(xl, yt, this.width, this.height);
+        if (this.image === "") {
+            ctx.fillStyle = "blue";
+            ctx.fillRect(xl, yt, this.width, this.height);
 
-        let fontSize = this.height / 2;
-        ctx.font = fontSize + "px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillStyle = "white";
-        ctx.fillText(this.id.toString(), this.x, this.y);
-
+            let fontSize = this.height / 2;
+            ctx.font = fontSize + "px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "white";
+            ctx.fillText(this.id.toString(), this.x, this.y);
+        } else {
+            ctx.fillStyle = "white";
+            ctx.fillRect(xl, yt, this.width, this.height);
+            ctx.drawImage(this.image, xl, yt, this.width, this.height);
+        }
         ctx.fillStyle = "red";
 
         ctx.beginPath();
@@ -102,7 +197,7 @@ function Card(x, y, width, height, id) {
     };
 
     this.containsArea = function (xa, ya) {
-        if(this.state === "removed"){
+        if (this.state === "removed") {
             return false;
         }
         return (xa > this.x - this.width / 2 &&
@@ -123,11 +218,13 @@ function Card(x, y, width, height, id) {
     };
 }
 
-function randomId(r, c) {
+function randomId(r, c, g) {
     this.size = r * c;
     this.returned = 0;
     this.list = [];
-    this.n = Math.floor(this.size / 2);console.log(this.n);
+    this.g = (g === undefined ? 2 : g);
+    this.n = Math.floor(this.size / this.g);
+
     for (let i = 0; i < this.n; i++) {
         this.list[i] = 0;
     }
@@ -139,7 +236,7 @@ function randomId(r, c) {
         do {
             s = Math.floor(Math.random() * this.n);
             this.list[s] += 1;
-        } while (this.list[s] > 2);
+        } while (this.list[s] > this.g);
         this.returned += 1;
         return s;
     };
@@ -165,5 +262,198 @@ function scoreLabel(x, y, width, height, text) {
         ctx.fillStyle = "black";
         ctx.fillText(this.text + this.score, this.x, this.y + this.height / 2);
         ctx.restore();
+    };
+}
+
+function optionScreen(canvas, themeOptions, numberOptions) {
+    this.width = canvas.width;
+    this.height = canvas.height;
+    let ctx = canvas.getContext("2d");
+    this.border = 20;
+    this.padding = 10;
+    this.fontSize = 40;
+    ctx.save();
+    ctx.font = this.fontSize + "px Arial";
+    let wordWidth = ctx.measureText("Iniciar").width;
+    ctx.restore();
+    this.buttonRight = this.width - this.border;
+    this.buttonLeft = this.width - this.border - 2 * this.padding - wordWidth;
+    this.buttonBottom = this.height - this.border;
+    this.buttonTop = this.height - this.border - 2 * this.padding - this.fontSize;
+    this.buttonUnsel = "orange";
+    this.buttonSel = "orangered";
+    this.buttonColor = this.buttonUnsel;
+    this.themeOptions = themeOptions;
+    this.selectedTheme = 0;
+    this.numberOptions = numberOptions;
+    this.numberPieces = [];
+    this.selectedNumber = 0;
+    for (let i = 0; i < this.numberOptions.length; i++) {
+        let value = this.numberOptions[i];
+        let q = value[0] * value[1];
+        if (q % 2 === 1) {
+            q -= 1;
+        }
+        this.numberPieces[i] = q;
+    }
+
+    this.showedTheme = -1;
+    this.showedNumber = -1;
+
+    this.draw = function (ctx) {
+        ctx.save();
+
+        ctx.fillStyle = this.buttonColor;
+        ctx.fillRect(this.buttonRight, this.buttonTop,
+                this.buttonLeft - this.buttonRight + 1,
+                this.buttonBottom - this.buttonTop + 1);
+        ctx.strokeStyle = "purple";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(this.buttonRight, this.buttonTop,
+                this.buttonLeft - this.buttonRight + 1,
+                this.buttonBottom - this.buttonTop + 1);
+        ctx.font = this.fontSize + "px Arial";
+        ctx.fillStyle = "black";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Iniciar",
+                (this.buttonLeft + this.buttonRight) / 2,
+                (this.buttonTop + this.buttonBottom) / 2);
+
+        ctx.strokeStyle = "red";
+        ctx.beginPath();
+        ctx.moveTo(this.width / 2, this.border);
+        ctx.lineTo(this.width / 2, this.buttonTop - this.border);
+        ctx.stroke();
+
+        ctx.font = 1.4 * this.fontSize + "px Arial";
+        ctx.fillStyle = "black";
+        let xf = this.border;
+        let yf = this.border + 0.7 * this.fontSize;
+        ctx.textAlign = "left";
+        ctx.fillText("Tema:", xf, yf);
+        ctx.font = this.fontSize + "px Arial";
+        yf += 0.3 * this.fontSize;
+        for (let i = 0; i < this.themeOptions.length; i++) {
+            yf += this.padding + this.fontSize;
+            if (this.showedTheme === i) {
+                if (this.selectedTheme === i) {
+                    ctx.fillStyle = "purple";
+                } else {
+                    ctx.fillStyle = "red";
+                }
+            } else if (this.selectedTheme === i) {
+                ctx.fillStyle = "blue";
+            } else {
+                ctx.fillStyle = "black";
+            }
+            ctx.fillText(this.themeOptions[i], xf, yf);
+
+        }
+
+        xf = this.width / 2 + this.border;
+        yf = this.border + 0.7 * this.fontSize;
+        ctx.font = 1.4 * this.fontSize + "px Arial";
+        ctx.fillText("Peças:", xf, yf);
+        ctx.font = this.fontSize + "px Arial";
+        yf += 0.3 * this.fontSize;
+        for (let i = 0; i < this.numberPieces.length; i++) {
+            yf += this.padding + this.fontSize;
+            if (this.showedNumber === i) {
+                if (this.selectedNumber === i) {
+                    ctx.fillStyle = "purple";
+                } else {
+                    ctx.fillStyle = "red";
+                }
+            } else if (this.selectedNumber === i) {
+                ctx.fillStyle = "blue";
+            } else {
+                ctx.fillStyle = "black";
+            }
+            ctx.fillText("" + this.numberPieces[i], xf, yf);
+        }
+
+        ctx.restore();
+    };
+
+    this.isClickArea = function (xa, ya) {
+
+        //    if(this.state !== "displayed"){
+        //        return false;
+        //    }
+        return (xa > this.buttonLeft && xa < this.buttonRight
+                && ya > this.buttonTop && ya < this.buttonBottom);
+    };
+
+    this.setPointer = function (canvas, xa, ya) {
+
+        //    if (this.state !== "displayed") {
+        //        return;
+        //    }
+        if (this.isClickArea(xa, ya)) {
+            canvas.style.cursor = "pointer";
+            this.buttonColor = this.buttonSel;
+        } else if (this.indexTheme(xa, ya) > -1
+                || this.indexNumber(xa, ya) > -1) {
+            canvas.style.cursor = "pointer";
+        } else {
+            canvas.style.cursor = "default";
+            this.buttonColor = this.buttonUnsel;
+        }
+
+    };
+
+    this.indexTheme = function (xa, ya) {
+
+        let yp = this.border + 1.4 * this.fontSize + this.padding;
+        let yp2 = yp + this.themeOptions.length * (this.fontSize + this.padding);
+
+        if (xa > this.border && xa < this.width / 2
+                && ya > yp && ya < yp2) {
+            return Math.floor((ya - yp) / (this.fontSize + this.padding));
+        }
+        return -1;
+    };
+
+    this.pointTheme = function (xa, ya) {
+        this.showedTheme = this.indexTheme(xa, ya);
+    };
+
+    this.selectTheme = function (xa, ya) {
+        let index = this.indexTheme(xa, ya);
+        if (index > -1) {
+            this.selectedTheme = index;
+        }
+    };
+
+    this.getTheme = function () {
+        return this.themeOptions[this.selectedTheme];
+    };
+
+    this.indexNumber = function (xa, ya) {
+
+        let yp = this.border + 1.4 * this.fontSize + this.padding;
+        let yp2 = yp + this.numberOptions.length * (this.fontSize + this.padding);
+
+        if (xa > this.border + this.width / 2 && xa < this.width
+                && ya > yp && ya < yp2) {
+            return Math.floor((ya - yp) / (this.fontSize + this.padding));
+        }
+        return -1;
+    };
+
+    this.pointNumber = function (xa, ya) {
+        this.showedNumber = this.indexNumber(xa, ya);
+    };
+
+    this.selectNumber = function (xa, ya) {
+        let index = this.indexNumber(xa, ya);
+        if (index > -1) {
+            this.selectedNumber = index;
+        }
+    };
+
+    this.getNumber = function () {
+        return this.numberOptions[this.selectedNumber];
     };
 }

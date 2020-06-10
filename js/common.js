@@ -1,5 +1,5 @@
-var defButton = {font: "80px Arial", selBackground: "orange",
-    unselBackground: "orangeRed", border: "green", borderWidth: 5, padding: 20};
+var defButton = {font: "80px Arial", selBackground: "orangered",
+    unselBackground: "orange", border: "green", borderWidth: 5, padding: 20};
 
 function button(text, x, y, config) {
     this.text = text;

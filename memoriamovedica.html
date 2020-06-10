@@ -76,18 +76,20 @@ Página do jogo Memória Movediça
 
 
             var cards = [];
+            var options = new optionScreen(canvas,
+                    ["Números", "Animais", "Flores", "Smiley"],
+                    [[3, 3], [3, 4], [4, 4], [4, 5], [5, 5], [5, 6], [6, 6]]);
             var ending = new endGame(canvas.width / 2, canvas.height / 2,
                     canvas.width * 0.8, canvas.height * 0.6, "img/thumbs_up_smiley.png");
 
             var waitClose = 0;
             var waitDisapear = 0;
 
-            function start() {
+            function start([r, c], theme) {
                 reset();
 
                 let p = score.height;
-                let r = 5;
-                let c = 4;
+
                 let s = 4;
                 let wc = (canvas.width - s * (c + 3)) / c;
                 let hc = (canvas.height - s * (r + 3) - p) / r;
@@ -108,7 +110,7 @@ Página do jogo Memória Movediça
                             continue;
                         }
                         cards.push(new Card(xi + i * (s + wc),
-                                yi + j * (s + hc), wc, hc, shuffler.next()));
+                                yi + j * (s + hc), wc, hc, shuffler.next(), theme));
                     }
                 }
                 pageShow = 3;
@@ -188,7 +190,7 @@ Página do jogo Memória Movediça
                     startButton.draw(ctx);
                     return;
                 } else if (pageShow === 2) {
-                    // code here.
+                    options.draw(ctx);
                 } else if (pageShow === 3) {
                     for (card of cards) {
                         card.draw(ctx);
@@ -210,11 +212,16 @@ Página do jogo Memória Movediça
                 let yc = e.offsetY;
                 if (pageShow === 1) {
                     if (startButton.isClickArea(xc, yc)) {
-                        start();
+                        pageShow = 2;
                         startButton.visible = false;
                     }
                 } else if (pageShow === 2) {
-                    //code here.
+                    if (options.isClickArea(xc, yc)) {
+                        start(options.getNumber(), options.getTheme());
+                    } else{
+                        options.selectTheme(xc, yc);
+                        options.selectNumber(xc, yc);
+                    }
                 } else if (pageShow === 3) {
                     if (openedCount === 2) {
                         return;
@@ -235,7 +242,7 @@ Página do jogo Memória Movediça
                     }
                 } else if (pageShow === 4) {
                     if (ending.isClickArea(xc, yc)) {
-                        start();
+                        pageShow = 2;
                         ending.hide();
                     }
                 }
@@ -244,8 +251,15 @@ Página do jogo Memória Movediça
             function pointButton(e) {
                 startButton.setPointer(canvas, e.offsetX, e.offsetY);
                 ending.setPointer(canvas, e.offsetX, e.offsetY);
+                if (pageShow === 2) {
+                    options.setPointer(canvas, e.offsetX, e.offsetY);
+                    options.pointTheme(e.offsetX, e.offsetY);
+                    options.pointNumber(e.offsetX, e.offsetY);
+                }
             }
+            
             interval = setInterval(run, 20);
+
         </script>
     </body>
 </html>
