@@ -4,7 +4,7 @@ Página do jogo Memória Movediça
 -->
 <html>
     <head>
-        <title>Memória Movediça - Jogos Javascript</title>
+        <title>Memória 3 - Jogos Javascript</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
@@ -13,27 +13,19 @@ Página do jogo Memória Movediça
         <script src="js/memoria.js"></script>
     </head>
     <body>
-        <h1>Memória Movediça</h1>
-        <p>Memória Movediça é um jogo similar ao jogo da memória tradicional,
-            com uma diferença: de tempos em tempos duas cartas aleatórias irão
-            trocar de posição entre si. O jogador deve ser rápido para achar os
-            pares antes que as cartas se movimentem ou tenha uma memória boa 
-            para lembrar a posição dos ítens após a movimentação.</p>
+        <h1>Memória 3</h1>
+        <p>Memória 3 é um jogo similar ao jogo da memória tradicional,
+            mas você deverá desvirar três figuras iguais para marcar pontos.</p>
 
         <h2>Como jogar</h2>
         <p>Clique no botão <span class="button-style">Jogar</span> para iniciar.
             Selecione o tema das imagens e a quantidade de peças em jogo, clique
             em <span class="button-style">Iniciar</span>.
-            Clique em duas cartas para desvirá-las. Se elas corresponderem à 
-            mesma imagem, serão retiradas do jogo e você ganha 10 pontos, caso
-            contrário, as cartas são viradas novamente e você perde 3 pontos. Há
-            um bônus adicional de 5 pontos cada vez que você desvira dois pares
-            corretos em sequência. Em intervalos por volta de 5 segundos, duas
-            cartas selecionadas de forma aleatória irão trocar de lugar. Nesse
-            momento todas as cartas estarão viradas e não será possível
-            desvirá-las até que as cartas em movimento cheguem no seu lugar de
-            destino. Memorize bem as cartas em movimento para não se confundir
-            com a posição delas.</p>
+            Clique em três cartas para desvirá-las. Se elas corresponderem à 
+            mesma imagem, serão retiradas do jogo e você ganha 15 pontos, caso
+            contrário, as cartas são viradas novamente e você perde 1 ponto. Há
+            um bônus adicional de 8 pontos cada vez que você desvira dois trios
+            corretos em sequência.</p>
         <div class="centered">
             <canvas id="game" width="600" height="600"
                     onclick="userClick(event)"
@@ -67,11 +59,9 @@ Página do jogo Memória Movediça
             var openedCount = 0;
             var lastOpened = null;
             var firstOpened = null;
+            var secondOpened = null;
             var score = new scoreLabel(0, 0, canvas.width, 50, "Pontuação: ");
             var foundLast = false;
-
-            var image = new Image();
-            image.src = "img/startPageMemory.png";
 
             var startButton = new button("Jogar",
                     canvas.width / 2, canvas.height / 2);
@@ -80,16 +70,12 @@ Página do jogo Memória Movediça
             var cards = [];
             var options = new optionScreen(canvas,
                     ["Números", "Animais", "Flores", "Icones", "Profissao", "Smiley"],
-                    [[3, 3], [3, 4], [4, 4], [4, 5], [5, 5], [5, 6], [6, 6]]);
+                    [[3, 4], [5, 5], [5, 6], [6, 6]]);
             var ending = new endGame(canvas.width / 2, canvas.height / 2,
                     canvas.width * 0.8, canvas.height * 0.6, "img/thumbs_up_smiley.png");
 
             var waitClose = 0;
             var waitDisapear = 0;
-            
-            var clock = 0;
-            var move1 = null;
-            var move2 = null;
 
             function start([r, c], theme) {
                 reset();
@@ -109,7 +95,7 @@ Página do jogo Memória Movediça
                     centerC = Math.floor(c / 2);
                 }
 
-                let shuffler = new randomId(r, c);
+                let shuffler = new randomId(r, c, 3);
                 for (let i = 0; i < c; i++) {
                     for (let j = 0; j < r; j++) {
                         if (i === centerC && j === centerR) {
@@ -125,13 +111,13 @@ Página do jogo Memória Movediça
             function reset() {
                 cardCount = 0;
                 firstOpened = null;
+                secondOpened = null;
                 lastOpened = null;
                 foundLast = false;
                 score.score = 0;
                 ending.points = 0;
                 cards = [];
                 canvas.style.cursor = "default";
-                clock = 0;
             }
 
             function update() {
@@ -139,20 +125,23 @@ Página do jogo Memória Movediça
                 if (pageShow === 3) {
 
                     if (lastOpened !== null) {
-                        if (lastOpened.id === firstOpened.id) {
+                        if (lastOpened.id === firstOpened.id
+                                && lastOpened.id === secondOpened.id) {
 
                             waitDisapear += 1;
                             if (waitDisapear === 20) {
                                 firstOpened.state = "removed";
+                                secondOpened.state = "removed";
                                 lastOpened.state = "removed";
                                 firstOpened = null;
+                                secondOpened = null;
                                 lastOpened = null;
                                 openedCount = 0;
-                                score.score += 10;
-                                cardCount += 2;
+                                score.score += 15;
+                                cardCount += 3;
 
                                 if (foundLast) {
-                                    score.score += 5;
+                                    score.score += 8;
                                 }
                                 if (cardCount === cards.length) {
                                     pageShow = 4;
@@ -167,46 +156,25 @@ Página do jogo Memória Movediça
                             waitClose += 1;
                             if (waitClose === 15) {
                                 firstOpened.state = "closing";
+                                secondOpened.state = "closing";
                                 lastOpened.state = "closing";
-                                score.score -= 3;
+                                score.score -= 1;
                                 foundLast = false;
                             }
-                        } else if (lastOpened.state === "closed" && firstOpened.state === "closed") {
+                        } else if (lastOpened.state === "closed"
+                                && firstOpened.state === "closed"
+                                && secondOpened.state === "closed") {
                             firstOpened = null;
+                            secondOpened = null;
                             lastOpened = null;
                             openedCount = 0;
                             waitClose = 0;
                         }
                     }
-                    
-                    if(move1 === null && firstOpened === null && clock > 200){
-                        
-                        let q = 0;
-                        do{
-                            let k = Math.floor(Math.random()*cards.length);
-                            if(cards[k].state === "closed"){
-                                if(q === 0){
-                                    move1 = cards[k];
-                                } else{
-                                    move2 = cards[k];
-                                }
-                                q += 1;
-                            }
-                        }while(q !== 2);
-                        move1.move(move2.x, move2.y);
-                        move2.move(move1.x, move1.y);
-                    }
-                    if(move1 !== null && move1.moving === false
-                            && move2.moving === false){
-                        move1 = null;
-                        move2 = null;
-                        clock = 0;
-                    }
 
                     for (card of cards) {
                         card.update();
                     }
-                    clock += 1;
                 } else if (pageShow === 4) {
                     ending.update();
                 }
@@ -217,7 +185,6 @@ Página do jogo Memória Movediça
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 if (pageShow === 1) {
-                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
                     startButton.draw(ctx);
                     return;
                 } else if (pageShow === 2) {
@@ -253,7 +220,7 @@ Página do jogo Memória Movediça
                         options.selectNumber(xc, yc);
                     }
                 } else if (pageShow === 3) {
-                    if (openedCount === 2 || move1 !== null) {
+                    if (openedCount === 3) {
                         return;
                     }
                     for (card of cards) {
@@ -264,8 +231,9 @@ Página do jogo Memória Movediça
                             }
                             if (openedCount === 1) {
                                 firstOpened = card;
-                            }
-                            if (openedCount === 2) {
+                            }else if (openedCount === 2) {
+                                secondOpened = card;
+                            } else if (openedCount === 3) {
                                 lastOpened = card;
                             }
                         }
@@ -293,14 +261,14 @@ Página do jogo Memória Movediça
             }
 
             interval = setInterval(run, 20);
-            
-            function resizeCanvas(){
+
+            function resizeCanvas() {
                 let wWidth = document.body.clientWidth;
-                
-                if(wWidth < 600){
+
+                if (wWidth < 600) {
                     canvas.width = wWidth;
                     canvas.height = wWidth;
-                } else{
+                } else {
                     canvas.width = 600;
                     canvas.height = 600;
                 }
