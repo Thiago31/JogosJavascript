@@ -22,6 +22,8 @@ Página do jogo Memória Movediça
 
         <h2>Como jogar</h2>
         <p>Clique no botão <span class="button-style">Jogar</span> para iniciar.
+            Selecione o tema das imagens e a quantidade de peças em jogo, clique
+            em <span class="button-style">Iniciar</span>.
             Clique em duas cartas para desvirá-las. Se elas corresponderem à 
             mesma imagem, serão retiradas do jogo e você ganha 10 pontos, caso
             contrário, as cartas são viradas novamente e você perde 3 pontos. Há
@@ -45,6 +47,7 @@ Página do jogo Memória Movediça
             var canvas = document.getElementById("game");
             canvas.style.background = "#e0ffff";
             var ctx = canvas.getContext("2d");
+            resizeCanvas();
 
             /* 
              * A variável pageShow é do tipo inteiro, controla qual página será
@@ -72,12 +75,11 @@ Página do jogo Memória Movediça
 
             var startButton = new button("Jogar",
                     canvas.width / 2, canvas.height / 2);
-            startButton.visible = true;
 
 
             var cards = [];
             var options = new optionScreen(canvas,
-                    ["Números", "Animais", "Flores", "Smiley"],
+                    ["Números", "Animais", "Flores", "Icones", "Profissao", "Smiley"],
                     [[3, 3], [3, 4], [4, 4], [4, 5], [5, 5], [5, 6], [6, 6]]);
             var ending = new endGame(canvas.width / 2, canvas.height / 2,
                     canvas.width * 0.8, canvas.height * 0.6, "img/thumbs_up_smiley.png");
@@ -129,56 +131,55 @@ Página do jogo Memória Movediça
 
             function update() {
 
-                if (pageShow === 1) {
-                    return;
-                }
+                if (pageShow === 3) {
 
-                if (lastOpened !== null) {
-                    if (lastOpened.id === firstOpened.id) {
+                    if (lastOpened !== null) {
+                        if (lastOpened.id === firstOpened.id) {
 
-                        waitDisapear += 1;
-                        if (waitDisapear === 20) {
-                            firstOpened.state = "removed";
-                            lastOpened.state = "removed";
+                            waitDisapear += 1;
+                            if (waitDisapear === 20) {
+                                firstOpened.state = "removed";
+                                lastOpened.state = "removed";
+                                firstOpened = null;
+                                lastOpened = null;
+                                openedCount = 0;
+                                score.score += 10;
+                                cardCount += 2;
+
+                                if (foundLast) {
+                                    score.score += 5;
+                                }
+                                if (cardCount === cards.length) {
+                                    pageShow = 4;
+                                    ending.state = "appearing";
+                                    ending.points = score.score;
+                                }
+                                foundLast = true;
+                                waitDisapear = 0;
+                            }
+
+                        } else if (lastOpened.state === "opened") {
+                            waitClose += 1;
+                            if (waitClose === 15) {
+                                firstOpened.state = "closing";
+                                lastOpened.state = "closing";
+                                score.score -= 3;
+                                foundLast = false;
+                            }
+                        } else if (lastOpened.state === "closed" && firstOpened.state === "closed") {
                             firstOpened = null;
                             lastOpened = null;
                             openedCount = 0;
-                            score.score += 10;
-                            cardCount += 2;
-
-                            if (foundLast) {
-                                score.score += 5;
-                            }
-                            if (cardCount === cards.length) {
-                                pageShow = 4;
-                                ending.state = "appearing";
-                                ending.points = score.score;
-                            }
-                            foundLast = true;
-                            waitDisapear = 0;
+                            waitClose = 0;
                         }
-
-                    } else if (lastOpened.state === "opened") {
-                        waitClose += 1;
-                        if (waitClose === 15) {
-                            firstOpened.state = "closing";
-                            lastOpened.state = "closing";
-                            score.score -= 3;
-                            foundLast = false;
-                        }
-                    } else if (lastOpened.state === "closed" && firstOpened.state === "closed") {
-                        firstOpened = null;
-                        lastOpened = null;
-                        openedCount = 0;
-                        waitClose = 0;
                     }
-                }
 
-                for (card of cards) {
-                    card.update();
+                    for (card of cards) {
+                        card.update();
+                    }
+                } else if (pageShow === 4) {
+                    ending.update();
                 }
-
-                ending.update();
             }
 
             function draw() {
@@ -186,7 +187,7 @@ Página do jogo Memória Movediça
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 if (pageShow === 1) {
-                    ctx.drawImage(image, 0, 0, 600, 600);
+                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
                     startButton.draw(ctx);
                     return;
                 } else if (pageShow === 2) {
@@ -213,12 +214,11 @@ Página do jogo Memória Movediça
                 if (pageShow === 1) {
                     if (startButton.isClickArea(xc, yc)) {
                         pageShow = 2;
-                        startButton.visible = false;
                     }
                 } else if (pageShow === 2) {
                     if (options.isClickArea(xc, yc)) {
                         start(options.getNumber(), options.getTheme());
-                    } else{
+                    } else {
                         options.selectTheme(xc, yc);
                         options.selectNumber(xc, yc);
                     }
@@ -249,16 +249,32 @@ Página do jogo Memória Movediça
             }
 
             function pointButton(e) {
-                startButton.setPointer(canvas, e.offsetX, e.offsetY);
-                ending.setPointer(canvas, e.offsetX, e.offsetY);
-                if (pageShow === 2) {
-                    options.setPointer(canvas, e.offsetX, e.offsetY);
-                    options.pointTheme(e.offsetX, e.offsetY);
-                    options.pointNumber(e.offsetX, e.offsetY);
+                let xc = e.offsetX;
+                let yc = e.offsetY;
+                if (pageShow === 1) {
+                    startButton.setPointer(canvas, xc, yc);
+                } else if (pageShow === 2) {
+                    options.setPointer(canvas, xc, yc);
+                    options.pointTheme(xc, yc);
+                    options.pointNumber(xc, yc);
+                } else if (pageShow === 4) {
+                    ending.setPointer(canvas, xc, yc);
                 }
             }
-            
+
             interval = setInterval(run, 20);
+            
+            function resizeCanvas(){
+                let wWidth = document.body.clientWidth;
+                
+                if(wWidth < 600){
+                    canvas.width = wWidth;
+                    canvas.height = wWidth;
+                } else{
+                    canvas.width = 600;
+                    canvas.height = 600;
+                }
+            }
 
         </script>
     </body>

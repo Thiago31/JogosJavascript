@@ -14,13 +14,10 @@ function button(text, x, y, config) {
     this.padding = config.padding || defButton.padding;
     this.border = config.border || defButton.border;
     this.borderWidth = config.borderWidth || defButton.borderWidth;
-    this.visible = false;
     this.background = this.unselBackground;
 
     this.draw = function (ctx) {
-        if (this.visible === false) {
-            return;
-        }
+
         ctx.save();
 
         ctx.font = this.font;
@@ -53,9 +50,7 @@ function button(text, x, y, config) {
     };
 
     this.setPointer = function (canvas, xa, ya) {
-        if (this.visible === false) {
-            return;
-        }
+
         if (this.isClickArea(xa, ya)) {
             canvas.style.cursor = "pointer";
             this.background = this.selBackground;

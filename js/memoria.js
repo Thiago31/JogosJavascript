@@ -58,6 +58,46 @@ var themes = {
         "water_lily.png",
         "yellow_rose_2.png"
     ],
+    "Icones": [
+        "black_man_red_hair_T.png",
+        "black_man_wearing_glasses_T.png",
+        "black_man_wearing_hat_T.png",
+        "black_man_wearing_headset_T.png",
+        "black_woman_long_blonde_hair_T.png",
+        "blonde_man_T.png",
+        "blonde_wearing_headset_T.png",
+        "business_man_blue_tie_T.png",
+        "business_man_pink_tie.png",
+        "man_hard_hat_red_shirt_T.png",
+        "man_redhead_wearing_headset_T.png",
+        "man_red_hard_hat_T.png",
+        "man_wearing_green_tie_T.png",
+        "man_wearing_hat_T.png",
+        "woman_cyan_blouse_T.png",
+        "woman_long_hair_red_blouse_T.png",
+        "woman_pink_blouse_T.png",
+        "woman_wearing_headset_T.png"
+    ],
+    "Profissao": [
+        "artist_T.png",
+        "businessman_T.png",
+        "carpenter_3_T.png",
+        "chef_color_T.png",
+        "cowboy_with_whip_T.png",
+        "delivery_T.png",
+        "farmer_T.png",
+        "fire_toon_T.png",
+        "knight_T.png",
+        "Model_05_T.png",
+        "movers_T.png",
+        "nurse_T.png",
+        "officer_stern_T.png",
+        "police_woman_in_blue_T.png",
+        "postman.png",
+        "secretary_T.png",
+        "smiling_small_clown_T.png",
+        "troubadour_T.png"
+    ],
     "Smiley": [
         "angel_wings_smiley_T.png",
         "bull-fighting-smilie.png",
@@ -125,7 +165,20 @@ function Card(x, y, width, height, id, theme) {
         } else {
             ctx.fillStyle = "white";
             ctx.fillRect(xl, yt, this.width, this.height);
-            ctx.drawImage(this.image, xl, yt, this.width, this.height);
+            let iWidth = this.width;
+            let iHeight = this.height;
+            let dw = 0;
+            let dh = 0;
+            if (this.image.width * this.image.height > 0) {
+                let fw = this.width / this.image.width;
+                let fh = this.height / this.image.height;
+                let f = Math.min(fw, fh);
+                iWidth = f * this.image.width;
+                iHeight = f * this.image.height;
+                dw = (this.width - iWidth) / 2;
+                dh = (this.height - iHeight) / 2;
+            }
+            ctx.drawImage(this.image, xl + dw, yt + dh, iWidth, iHeight);
         }
         ctx.fillStyle = "red";
 
@@ -354,6 +407,7 @@ function optionScreen(canvas, themeOptions, numberOptions) {
         xf = this.width / 2 + this.border;
         yf = this.border + 0.7 * this.fontSize;
         ctx.font = 1.4 * this.fontSize + "px Arial";
+        ctx.fillStyle = "black";
         ctx.fillText("Peças:", xf, yf);
         ctx.font = this.fontSize + "px Arial";
         yf += 0.3 * this.fontSize;
@@ -378,18 +432,12 @@ function optionScreen(canvas, themeOptions, numberOptions) {
 
     this.isClickArea = function (xa, ya) {
 
-        //    if(this.state !== "displayed"){
-        //        return false;
-        //    }
         return (xa > this.buttonLeft && xa < this.buttonRight
                 && ya > this.buttonTop && ya < this.buttonBottom);
     };
 
     this.setPointer = function (canvas, xa, ya) {
 
-        //    if (this.state !== "displayed") {
-        //        return;
-        //    }
         if (this.isClickArea(xa, ya)) {
             canvas.style.cursor = "pointer";
             this.buttonColor = this.buttonSel;
