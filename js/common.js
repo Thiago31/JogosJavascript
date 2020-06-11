@@ -128,7 +128,7 @@ function endGame(x, y, width, height, imagesrc) {
 
             let hIm = this.atualHeight - 4 * h - 4 * s - 2 * p;
             let yIm = this.yp + 3 * h + 2 * s;
-            let wIm = image.width * hIm / image.height;
+            let wIm = this.image.width * hIm / this.image.height;
             let xIm = this.x - wIm / 2;
             ctx.drawImage(this.image, xIm, yIm, wIm, hIm);
             
