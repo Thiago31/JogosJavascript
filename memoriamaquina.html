@@ -1,0 +1,252 @@
+<html>
+    <head>
+        <title>Memória Contra a Máquina</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="css/style.css"/>
+        <link rel="shortcut icon" href="favicon/favicon.ico" />
+        <script src="js/common.js"></script>
+        <script src="js/animation.js"></script>
+        <script src="js/memoria.js"></script>
+    </head>
+    <body>
+        <h1>Memória Contra a Máquina</h1>        
+        <p>Em Memória Contra a Máquina você testará suas habilidades de 
+            memorização contra o computador. Há três níveis de dificuldade para
+            escolher. Escolha o nível difícil e mostre que você é craque.</p>
+        <div class="centered">
+            <canvas id="jogo" width="600" height="600"></canvas>
+        </div>
+        <h2>Como jogar</h2>
+        <p>Clique no botão <span class="button-style">Jogar</span> para iniciar.
+            Selecione o tema das imagens, o nível de dificuldade e a quantidade
+            de cartas em jogo, clique em <span class="button-style">Iniciar</span>.</p>
+        <p>É exibida na parte superior da tela a pontuação do jogador, a pontuação
+            do computador e uma indicação de quem tem a vez de jogar. Você inicia
+            o jogo. Clique em duas cartas, se elas formarem um par, serão removidas
+            e você ganhará 10 pontos e continuará jogando, caso contrário,
+            passará a vez para o computador. O computador tentará encontrar
+            um par, caso consiga, ganhará 10 pontos e continuará jogando, caso
+            contrário, passará a vez para você. Esse processo se repete
+            até que todas as cartas sejam removidas. No final, é exibido a
+            pontuação de cada um. Você vencerá o jogo se fizer mais pontos que o
+            computador. Clique em <span class="button-style">Jogar novamente</span> para começar uma nova partida, as configurações definidas
+            anteriormente (tema das cartas, nível de dificuldade, e número de 
+            cartas) estarão salvas, você pode mudá-las se preferir.<p>
+        <br><br>
+        <a href="index.html">Voltar</a>
+        <br><br>   
+
+        <script>
+            var canvas = document.getElementById("jogo");
+
+            var cardsInGame = 0;
+            var openedCards = 0;
+            var firstCard = null;
+            var secondCard = null;
+
+            var currentPlayer = null;
+            var pagecolor = "#add8e6";
+
+            var game = new Game(canvas);
+            game.createStartPage("Jogar", pagecolor, "color");
+            var page2 = new Page(canvas);
+
+            var button2 = new GButton(canvas, "Iniciar", 0.5, 0.8, 0.1);
+
+            var temas = new GOptions(canvas, 0.05, 0.05, 0.4, 0.6, "Tema",
+                    {"Números": "Números", "Animais": "Animais",
+                        "Flores": "Flores", "Ícones": "Icones",
+                        "Profissão": "Profissao", "Smiley": "Smiley"});
+
+            var level = new GOptions(canvas, 0.55, 0.05, 0.4, 0.3, "Nível",
+                    {"Fácil": "easy", "Médio": "medium", "Difícil": "hard"});
+
+            var cardNumber = new GOptions(canvas, 0.55, 0.4, 0.4, 0.3, "N° peças",
+                    {"24": [5, 5], "30": [5, 6], "36": [6, 6]});
+
+            page2.addElement(button2);
+            page2.addElement(temas);
+            page2.addElement(cardNumber);
+            page2.addElement(level);
+
+            var page3 = new Page(canvas);
+
+            var playerScore = new GLabel(canvas, "Jogador: ", 0.02, 0.02, 0.4, 0.5);
+            var computerScore = new GLabel(canvas, "Computador: ", 0.5, 0.02, 0.4, 0.5);
+            var toPlay = new GLabel(canvas, "É a vez do Jogador", 0.02, 0.5, 1, 0.5);
+            var scoreBar = new GPane(canvas, 0.5, 0.05, 1, 0.1);
+            scoreBar.borderColor = "black";
+            scoreBar.borderWidth = 2;
+            scoreBar.addElement(playerScore);
+            scoreBar.addElement(computerScore);
+            scoreBar.addElement(toPlay);
+            page3.addElement(scoreBar);
+            var player = new Player(playerScore);
+            var computer = new CPMemory(computerScore);
+            player.opponent = computer;
+            computer.opponent = player;
+            player.name = "Jogador";
+            computer.name = "Computador";
+
+            page4 = new Page(canvas);
+            var label1 = new GLabel(canvas, "Você venceu", 0, 0.05, 1, 0.1);
+            label1.align = "center";
+            var label2 = new GLabel(canvas, "Sua pontuação:", 0, 0.15, 1, 0.1);
+            label2.align = "center";
+            var label3 = new GLabel(canvas, "Computador:", 0, 0.25, 1, 0.1);
+            label3.align = "center";
+            var endimage = new GImageGroup(canvas, {"victory": "img/champion_T.png",
+                "defeat": "img/thumb_up_side_view_T.png", "draw": "img/handshake_T.png"},
+                    0.5, 0.55, 0.4, 0.4);
+            var button4 = new GButton(canvas, "Jogar novamente", 0.5, 0.85, 0.1);
+            var endpane = new GPane(canvas, 0.5, 0.5, 0.8, 0.8);
+            endpane.addElement(label1);
+            endpane.addElement(label2);
+            endpane.addElement(label3);
+            endpane.addElement(endimage);
+            endpane.addElement(button4);
+            var animation = new SizeAnimation(endpane);
+            page4.addElement(endpane);
+            page4.setFinalScore = function (playerScore, computerScore) {
+                if (playerScore > computerScore) {
+                    label1.text = "Você venceu!!!";
+                    endimage.setImage("victory");
+                } else if (playerScore < computerScore) {
+                    label1.text = "Você perdeu!!!";
+                    endimage.setImage("defeat");
+                } else {
+                    label1.text = "Empatou!!!";
+                    endimage.setImage("draw");
+                }
+                label2.text = "Sua pontuação: " + playerScore;
+                label3.text = "Computador: " + computerScore;
+
+                var fw = endpane.width;
+                var fh = endpane.height;
+                endpane.zerify();
+                animation.start(fw, fh, 40);
+            };
+
+            page3.rs = 0.025;
+            page3.rbx = 0.025;
+            page3.rby = 0.15;
+            page3.rbw = 0.95;
+            page3.rbh = 0.825;
+            page3.init = function ([r, c], theme, gamelevel) {
+                cardsInGame = 0;
+                this.removeAllElements();
+                player.resetScore();
+                computer.resetScore();
+                computer.level = gamelevel;
+
+                currentPlayer = player;
+                toPlay.text = "É a vez do Jogador";
+                page3.addElement(scoreBar);
+
+                var rcw = (this.rbw - (c - 1) * this.rs) / c;
+                var rch = (this.rbh - (r - 1) * this.rs) / r;
+
+                var centerR = -1;
+                var centerC = -1;
+                if (r * c % 2 === 1) {
+                    centerR = Math.floor(r / 2);
+                    centerC = Math.floor(c / 2);
+                }
+
+                var shuffler = new randomId(r, c);
+                var rcx, rcy;
+                for (var i = 0; i < c; i++) {
+                    rcx = this.rbx + rcw / 2 + i * (rcw + this.rs);
+                    for (var j = 0; j < r; j++) {
+                        if (i === centerC && j === centerR) {
+                            continue;
+                        }
+                        rcy = this.rby + rch / 2 + j * (rch + this.rs);
+                        var card = new GCard(canvas, rcx, rcy, rcw, rch,
+                                shuffler.next(), theme);
+                        card.click = function () {
+                            if (this.state === "removed" || openedCards === 2) {
+                                return;
+                            }
+                            if (this.state === "closed") {
+                                this.state = "opening";
+                                if (firstCard === null) {
+                                    firstCard = this;
+                                } else if (secondCard === null) {
+                                    secondCard = this;
+                                }
+                                openedCards++;
+                                computer.setCardState(this, "known");
+                            }
+                        };
+                        this.addElement(card);
+                        computer.addCard(card);
+                        cardsInGame++;
+                    }
+            }
+            };
+
+            page3.update = function () {
+
+                if (openedCards === 2 && secondCard.state === "opened") {
+                    game.sleep(500);
+                    this.active = false;
+                    if (firstCard.id === secondCard.id) {
+                        firstCard.state = "removedwait";
+                        secondCard.state = "removedwait";
+                        firstCard.clickable = false;
+                        secondCard.clickable = false;
+                        currentPlayer.addScore(10);
+                        computer.setCardState(firstCard, "removed");
+                        computer.setCardState(secondCard, "removed");
+                        cardsInGame -= 2;
+                    } else {
+                        firstCard.state = "closing";
+                        secondCard.state = "closing";
+                        currentPlayer = currentPlayer.opponent;
+                        toPlay.text = "É a vez do " + currentPlayer.name;
+                    }
+                    firstCard = null;
+                    secondCard = null;
+                    openedCards = 0;
+
+                }
+                if (this.active === false) {
+                    return;
+                }
+
+                if (cardsInGame === 0) {
+                    page4.setFinalScore(player.score, computer.score);
+                    game.setPage(3);
+                    return;
+                }
+
+                if (openedCards === 0) {
+                    currentPlayer.play();
+                } else if (openedCards === 1 && firstCard.state === "opened") {
+                    currentPlayer.play();
+                }
+
+                for (var i = 0; i < this.elements.length; i++) {
+                    this.elements[i].update();
+                }
+            };
+
+            game.addPage(page2);
+            game.addPage(page3);
+            game.addPage(page4);
+            game.linkButtonToPage(button4, 1);
+            button2.click = function () {
+                page3.init(cardNumber.getSelected(), temas.getSelected(), level.getSelected());
+                game.setPage(2);
+            };
+
+            game.setPageColor(pagecolor);
+
+            game.resizeCanvas();
+            game.start();
+
+        </script>
+    </body>
+</html>

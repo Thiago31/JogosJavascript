@@ -94,24 +94,24 @@ Página do jogo Memória Movediça
             function start([r, c], theme) {
                 reset();
 
-                let p = score.height;
+                var p = score.height;
 
-                let s = 4;
-                let wc = (canvas.width - s * (c + 3)) / c;
-                let hc = (canvas.height - s * (r + 3) - p) / r;
-                let xi = 2 * s + wc / 2;
-                let yi = p + 2 * s + hc / 2;
+                var s = 4;
+                var wc = (canvas.width - s * (c + 3)) / c;
+                var hc = (canvas.height - s * (r + 3) - p) / r;
+                var xi = 2 * s + wc / 2;
+                var yi = p + 2 * s + hc / 2;
 
-                let centerR = -1;
-                let centerC = -1;
+                var centerR = -1;
+                var centerC = -1;
                 if (r * c % 2 === 1) {
                     centerR = Math.floor(r / 2);
                     centerC = Math.floor(c / 2);
                 }
 
-                let shuffler = new randomId(r, c);
-                for (let i = 0; i < c; i++) {
-                    for (let j = 0; j < r; j++) {
+                var shuffler = new randomId(r, c);
+                for (var i = 0; i < c; i++) {
+                    for (var j = 0; j < r; j++) {
                         if (i === centerC && j === centerR) {
                             continue;
                         }
@@ -181,9 +181,9 @@ Página do jogo Memória Movediça
                     
                     if(move1 === null && firstOpened === null && clock > 250){
                         
-                        let q = 0;
+                        var q = 0;
                         do{
-                            let k = Math.floor(Math.random()*cards.length);
+                            var k = Math.floor(Math.random()*cards.length);
                             if(cards[k].state === "closed"){
                                 if(q === 0){
                                     move1 = cards[k];
@@ -239,8 +239,8 @@ Página do jogo Memória Movediça
             }
 
             function userClick(e) {
-                let xc = e.offsetX;
-                let yc = e.offsetY;
+                var xc = e.offsetX;
+                var yc = e.offsetY;
                 if (pageShow === 1) {
                     if (startButton.isClickArea(xc, yc)) {
                         pageShow = 2;
@@ -279,8 +279,8 @@ Página do jogo Memória Movediça
             }
 
             function pointButton(e) {
-                let xc = e.offsetX;
-                let yc = e.offsetY;
+                var xc = e.offsetX;
+                var yc = e.offsetY;
                 if (pageShow === 1) {
                     startButton.setPointer(canvas, xc, yc);
                 } else if (pageShow === 2) {
@@ -295,7 +295,7 @@ Página do jogo Memória Movediça
             interval = setInterval(run, 20);
             
             function resizeCanvas(){
-                let wWidth = document.body.clientWidth;
+                var wWidth = document.body.clientWidth;
                 
                 if(wWidth < 600){
                     canvas.width = wWidth;

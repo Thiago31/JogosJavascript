@@ -1,21 +1,17 @@
-canvas{
-	border: 3px solid blue;
-	background-color: black;
-}
 body{
 	background-color: white;
 	width: 80%;
 	margin: 0 10% 0 10%;
-	border-right: 2px solid red;
 }
 .centered{
 	text-align: center;
+        margin: 20px 0 20px 0;
 }
 h1, h2{
 	text-align: left;
 	margin: 20px 0 10px 0;
 	padding: 8px;
-	border-radius: 20px 0 0 20px;
+	border-radius: 20px;
 }
 h1{
 	background-color: orange;
@@ -28,10 +24,13 @@ p{
 	text-indent: 25px;
 	margin: 0 10px 10px 10px;
 }
+ol{
+    text-align: justify;
+}
 .button-style{
 	border: 1px solid black;
-	padding: 3px;
-	border-radius: 12px;
+	padding: 0;
+        margin: 1px 0 1px 0;
 	background-color: rgb(230, 230, 230);
 	color: blue;
 }
@@ -40,9 +39,11 @@ p{
     body{
         width: 100%;
         margin: 0;
-        border: none;
     }
-    canvas{
-        border: none;
+    h1, h2{
+        margin: 10px 0 10px 0;
+    }
+    p{
+        margin: 0 0 0 5px;
     }
 }

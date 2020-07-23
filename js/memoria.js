@@ -147,16 +147,16 @@ function Card(x, y, width, height, id, theme) {
         ctx.save();
 
 
-        let yt = this.y - this.height / 2;
-        let yb = this.y + this.height / 2;
-        let xl = this.x - this.width / 2;
-        let xr = this.x + this.width / 2;
+        var yt = this.y - this.height / 2;
+        var yb = this.y + this.height / 2;
+        var xl = this.x - this.width / 2;
+        var xr = this.x + this.width / 2;
 
         if (this.image === "") {
             ctx.fillStyle = "blue";
             ctx.fillRect(xl, yt, this.width, this.height);
 
-            let fontSize = this.height / 2;
+            var fontSize = this.height / 2;
             ctx.font = fontSize + "px Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -165,14 +165,14 @@ function Card(x, y, width, height, id, theme) {
         } else {
             ctx.fillStyle = "white";
             ctx.fillRect(xl, yt, this.width, this.height);
-            let iWidth = this.width;
-            let iHeight = this.height;
-            let dw = 0;
-            let dh = 0;
+            var iWidth = this.width;
+            var iHeight = this.height;
+            var dw = 0;
+            var dh = 0;
             if (this.image.width * this.image.height > 0) {
-                let fw = this.width / this.image.width;
-                let fh = this.height / this.image.height;
-                let f = Math.min(fw, fh);
+                var fw = this.width / this.image.width;
+                var fh = this.height / this.image.height;
+                var f = Math.min(fw, fh);
                 iWidth = f * this.image.width;
                 iHeight = f * this.image.height;
                 dw = (this.width - iWidth) / 2;
@@ -214,8 +214,8 @@ function Card(x, y, width, height, id, theme) {
     };
 
     this.update = function ( ) {
-        let xfrag = this.width / 20;
-        let yfrag = this.height / 20;
+        var xfrag = this.width / 20;
+        var yfrag = this.height / 20;
         if (this.state === "opening") {
             this.xd += xfrag;
             this.yd += yfrag;
@@ -232,12 +232,12 @@ function Card(x, y, width, height, id, theme) {
         }
 
         if (this.moving) {
-            let vecX = this.vectorMove.x - this.x;
-            let vecY = this.vectorMove.y - this.y;
+            var vecX = this.vectorMove.x - this.x;
+            var vecY = this.vectorMove.y - this.y;
 
             if ((vecX * vecX + vecY * vecY) > (this.vectorMove.v * this.vectorMove.v)) {
-                let vecMod = Math.sqrt(vecX * vecX + vecY * vecY);
-                let n = this.vectorMove.v / vecMod;
+                var vecMod = Math.sqrt(vecX * vecX + vecY * vecY);
+                var n = this.vectorMove.v / vecMod;
                 vecX = n * vecX;
                 vecY = n * vecY;
             } else {
@@ -285,7 +285,7 @@ function randomId(r, c, g) {
         if (this.returned === this.size) {
             return -1;
         }
-        let s = -1;
+        var s = -1;
         do {
             s = Math.floor(Math.random() * this.n);
             this.list[s] += 1;
@@ -321,13 +321,13 @@ function scoreLabel(x, y, width, height, text) {
 function optionScreen(canvas, themeOptions, numberOptions) {
     this.width = canvas.width;
     this.height = canvas.height;
-    let ctx = canvas.getContext("2d");
+    var ctx = canvas.getContext("2d");
     this.border = 20;
     this.padding = 10;
     this.fontSize = 40;
     ctx.save();
     ctx.font = this.fontSize + "px Arial";
-    let wordWidth = ctx.measureText("Iniciar").width;
+    var wordWidth = ctx.measureText("Iniciar").width;
     ctx.restore();
     this.buttonRight = this.width - this.border;
     this.buttonLeft = this.width - this.border - 2 * this.padding - wordWidth;
@@ -342,8 +342,8 @@ function optionScreen(canvas, themeOptions, numberOptions) {
     this.numberPieces = [];
     this.selectedNumber = 0;
     for (let i = 0; i < this.numberOptions.length; i++) {
-        let value = this.numberOptions[i];
-        let q = value[0] * value[1];
+        var value = this.numberOptions[i];
+        var q = value[0] * value[1];
         if (q % 2 === 1) {
             q -= 1;
         }
@@ -381,8 +381,8 @@ function optionScreen(canvas, themeOptions, numberOptions) {
 
         ctx.font = 1.4 * this.fontSize + "px Arial";
         ctx.fillStyle = "black";
-        let xf = this.border;
-        let yf = this.border + 0.7 * this.fontSize;
+        var xf = this.border;
+        var yf = this.border + 0.7 * this.fontSize;
         ctx.textAlign = "left";
         ctx.fillText("Tema:", xf, yf);
         ctx.font = this.fontSize + "px Arial";
@@ -453,8 +453,8 @@ function optionScreen(canvas, themeOptions, numberOptions) {
 
     this.indexTheme = function (xa, ya) {
 
-        let yp = this.border + 1.4 * this.fontSize + this.padding;
-        let yp2 = yp + this.themeOptions.length * (this.fontSize + this.padding);
+        var yp = this.border + 1.4 * this.fontSize + this.padding;
+        var yp2 = yp + this.themeOptions.length * (this.fontSize + this.padding);
 
         if (xa > this.border && xa < this.width / 2
                 && ya > yp && ya < yp2) {
@@ -468,7 +468,7 @@ function optionScreen(canvas, themeOptions, numberOptions) {
     };
 
     this.selectTheme = function (xa, ya) {
-        let index = this.indexTheme(xa, ya);
+        var index = this.indexTheme(xa, ya);
         if (index > -1) {
             this.selectedTheme = index;
         }
@@ -480,8 +480,8 @@ function optionScreen(canvas, themeOptions, numberOptions) {
 
     this.indexNumber = function (xa, ya) {
 
-        let yp = this.border + 1.4 * this.fontSize + this.padding;
-        let yp2 = yp + this.numberOptions.length * (this.fontSize + this.padding);
+        var yp = this.border + 1.4 * this.fontSize + this.padding;
+        var yp2 = yp + this.numberOptions.length * (this.fontSize + this.padding);
 
         if (xa > this.border + this.width / 2 && xa < this.width
                 && ya > yp && ya < yp2) {
@@ -495,7 +495,7 @@ function optionScreen(canvas, themeOptions, numberOptions) {
     };
 
     this.selectNumber = function (xa, ya) {
-        let index = this.indexNumber(xa, ya);
+        var index = this.indexNumber(xa, ya);
         if (index > -1) {
             this.selectedNumber = index;
         }
@@ -504,4 +504,261 @@ function optionScreen(canvas, themeOptions, numberOptions) {
     this.getNumber = function () {
         return this.numberOptions[this.selectedNumber];
     };
+}
+
+function GCard(canvas, rx, ry, rw, rh, id, theme) {
+    GElement.call(this, canvas, rx, ry, rw, rh);
+    this.state = "closed";
+    this.clickable = true;
+
+    this.xd = 0;
+    this.yd = 0;
+    this.id = id;
+    if (theme === undefined || theme === "Números") {
+        this.image = "";
+    } else {
+        this.image = new Image();
+        this.image.src = "img/themes/" + theme + "/" + themes[theme][id];
+    }
+
+    this.draw = function () {
+
+        if (this.state === "removed") {
+            return;
+        }
+        ctx = this.canvas.getContext("2d");
+        ctx.save();
+
+
+        var yt = this.y - this.height / 2;
+        var yb = this.y + this.height / 2;
+        var xl = this.x - this.width / 2;
+        var xr = this.x + this.width / 2;
+
+        if (this.image === "") {
+            ctx.fillStyle = "blue";
+            ctx.fillRect(xl, yt, this.width, this.height);
+
+            var fontSize = this.height / 2;
+            ctx.font = fontSize + "px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "white";
+            ctx.fillText(this.id.toString(), this.x, this.y);
+        } else {
+            ctx.fillStyle = "white";
+            ctx.fillRect(xl, yt, this.width, this.height);
+            var iWidth = this.width;
+            var iHeight = this.height;
+            var dw = 0;
+            var dh = 0;
+            if (this.image.width * this.image.height > 0) {
+                var fw = this.width / this.image.width;
+                var fh = this.height / this.image.height;
+                var f = Math.min(fw, fh);
+                iWidth = f * this.image.width;
+                iHeight = f * this.image.height;
+                dw = (this.width - iWidth) / 2;
+                dh = (this.height - iHeight) / 2;
+            }
+            ctx.drawImage(this.image, xl + dw, yt + dh, iWidth, iHeight);
+        }
+        ctx.fillStyle = "red";
+
+        ctx.beginPath();
+        ctx.moveTo(xl, yt);
+        ctx.lineTo(xr, yt);
+        ctx.lineTo(this.x, this.y - this.yd);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(xl, yb);
+        ctx.lineTo(xr, yb);
+        ctx.lineTo(this.x, this.y + this.yd);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(xl, yt);
+        ctx.lineTo(xl, yb);
+        ctx.lineTo(this.x - this.xd, this.y);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(xr, yt);
+        ctx.lineTo(xr, yb);
+        ctx.lineTo(this.x + this.xd, this.y);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+    };
+
+    this.update = function ( ) {
+        var xfrag = this.width / 20;
+        var yfrag = this.height / 20;
+        if (this.state === "opening") {
+            this.xd += xfrag;
+            this.yd += yfrag;
+            if (this.xd >= this.width / 2 ||
+                    this.yd >= this.height / 2) {
+                this.state = "opened";
+                this.xd = this.width / 2;
+                this.yd = this.height / 2;
+            }
+        } else if (this.state === "closing") {
+            this.xd -= xfrag;
+            this.yd -= yfrag;
+            if (this.xd <= 0 || this.yd <= 0) {
+                this.state = "closed";
+            }
+        } else if (this.state === "removedwait") {
+            this.state = "removed";
+        }
+        this.updateAnimations();
+    };
+
+    this.click = function () {
+        if (this.state === "removed") {
+            return;
+        }
+        if (this.state === "closed") {
+            this.state = "opening";
+        } else if (this.state === "opened") {
+            this.state = "closing";
+        }
+    };
+
+    this.computeDimensions();
+}
+
+function CPMemory(page, labelscore) {
+    ComputerPlayer.call(this, page, labelscore);
+
+    this.cards = [];
+    this.cardsState = [];
+    this.card1 = null;
+    this.card2 = null;
+    this.level = "easy";
+
+    this.resetScore = function () {
+        this.score = 0;
+        this.labelscore.text = this.labeltext + this.score;
+        this.cards = [];
+        this.cardsState = [];
+    };
+
+    this.addCard = function (card) {
+        this.cards.push(card);
+        this.cardsState.push("unknown");
+    };
+
+    this.setCardState = function (card, state) {
+        for (var i = 0; i < this.cards.length; i++) {
+            if (this.cards[i] === card) {
+                this.cardsState[i] = state;
+                return;
+            }
+        }
+    };
+
+    this.findPair = function () {
+        for (var i = 0; i < this.cards.length - 1; i++) {
+            if (this.cardsState[i] === "known") {
+                for (var j = i + 1; j < this.cards.length; j++) {
+                    if (this.cardsState[j] === "known"
+                            && this.cards[i].id === this.cards[j].id) {
+                        return [i, j];
+                    }
+                }
+            }
+        }
+        return null;
+    };
+
+    this.combineCard = function (index) {
+        var fid = this.cards[index].id;
+        for(var i = 0; i < this.cards.length; i++){
+            if(i === index){
+                continue;
+            }
+            if(this.cardsState[i] === "known"
+                    && this.cards[i].id === fid){
+                return i;
+            }
+        }
+        var rid = index;
+        while(rid === index){
+            rid = this.randomCard();
+        }
+        return rid;
+    };
+
+    this.randomPair = function () {
+        var id1 = -1;
+        var id2 = -2;
+        var r;
+        while (id2 < 0) {
+            r = Math.floor(Math.random() * this.cards.length);
+            if (this.cardsState[r] !== "removed") {
+                if (id1 === -1) {
+                    id1 = r;
+                } else if (id1 !== r) {
+                    id2 = r;
+                }
+            }
+        }
+        return [id1, id2];
+    };
+
+    this.randomCard = function () {
+        var rid = -1;
+        var r;
+        while(rid < 0){
+            r = Math.floor(Math.random() * this.cards.length);
+            if(this.cardsState[r] === "unknown"){
+                rid = r;
+            }
+        }
+        return rid;
+    };
+    
+    this.selectPair = function(){
+        var c1 = this.findPair();
+        if(c1 === null){
+            var i1 = this.randomCard();
+            var i2 = this.combineCard(i1);
+            c1 = [i1, i2];
+        }
+        return c1;
+    };
+
+    this.play = function () {
+        if (this.card1 === null) {
+            var c1;
+            if (this.level === "easy") {
+                c1 = this.randomPair();
+            } else if (this.level === "medium") {
+                var random = Math.random();
+                if (random < 0.5) {
+                    c1 = this.randomPair();
+                } else {
+                    c1 = this.selectPair();
+                }
+            } else if (this.level === "hard") {
+                c1 = this.selectPair();
+            }
+            this.card1 = this.cards[c1[0]];
+            this.card2 = this.cards[c1[1]];
+            this.card1.click();
+        } else {
+            this.card2.click();
+            this.card1 = null;
+            this.card2 = null;
+        }
+
+    };
+
 }
